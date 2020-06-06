@@ -36,6 +36,7 @@ functions:
       - http:
           path: /stats/monthly
           method: get
+          cors: true
 
   # Async price loader for given criteria
   price-loader:
