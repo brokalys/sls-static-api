@@ -1,0 +1,100 @@
+service: sls-static-api
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  cfLogs: true
+  logRetentionInDays: 7
+  versionFunctions: false
+  timeout: 3
+  logs:
+    restApi:
+      level: ERROR
+  environment:
+    APP_STAGE: ${self:provider.stage}
+  apiGateway:
+    metrics: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - SNS:Publish
+      Resource: "arn:aws:sns:eu-west-1:*:*"
+    - Effect: Allow
+      Action:
+        - dynamodb:BatchGetItem
+        - dynamodb:PutItem
+      Resource:
+        - "Fn::GetAtt": [ PropertiesMonthlyTable, Arn ]
+
+functions:
+  # Public API
+  api-monthly-stats:
+    handler: src/api/monthly-stats.run
+    events:
+      - http:
+          path: /stats/monthly
+          method: get
+
+  # Async price loader for given criteria
+  price-loader:
+    handler: src/async-operations/price-loader.run
+    events:
+      - sns: load-properties
+
+plugins:
+  - serverless-domain-manager
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-offline-sns
+
+custom:
+  customDomain:
+    domainName: static-api.brokalys.com
+    stage: prod
+    certificateName: '*.brokalys.com'
+    createRoute53Record: true
+    endpointType: edge
+
+  serverless-offline:
+    useChildProcesses: true
+
+  serverless-offline-sns:
+    port: 4002
+    debug: true
+
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      convertEmptyValues: true
+
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules:
+      forceExclude:
+        - aws-sdk
+    packager: yarn
+
+resources:
+  Resources:
+    PropertiesMonthlyTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.stage}-properties-monthly
+        AttributeDefinitions:
+          - AttributeName: hash
+            AttributeType: S
+        KeySchema:
+          - AttributeName: hash
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

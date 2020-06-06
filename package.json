@@ -1,0 +1,56 @@
+{
+  "name": "sls-static-api",
+  "version": "1.0.0",
+  "description": "Pre-calculated (fast) API for Brokalys",
+  "author": "Matiss Janis Aboltins <matiss@mja.lv>",
+  "license": "MIT",
+  "scripts": {
+    "start": "sls offline start",
+    "lint": "eslint src",
+    "test": "jest --coverage",
+    "deploy": "serverless deploy",
+    "deploy:ci": "yarn deploy --conceal --stage prod"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "axios": "^0.19.2",
+    "moment": "^2.26.0",
+    "moment-range": "^4.0.2",
+    "numbers": "^0.7.0",
+    "serverless-dynamodb-client": "^0.0.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
+    "aws-sdk": "^2.686.0",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.0.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^4.2.1",
+    "jest": "^26.0.1",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.0.5",
+    "serverless": "^1.71.3",
+    "serverless-domain-manager": "^4.1.1",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.3.0",
+    "serverless-offline-sns": "^0.68.0",
+    "serverless-webpack": "^5.3.2",
+    "webpack": "^4.43.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-emoji"
+    }
+  }
+}
