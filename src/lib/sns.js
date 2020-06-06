@@ -16,7 +16,7 @@ export function publish(message) {
         default: JSON.stringify(message),
       }),
       MessageStructure: 'json',
-      TopicArn: `arn:aws:sns:${process.env.AWS_REGION}:${accountId}:load-properties`,
+      TopicArn: `arn:aws:sns:${process.env.AWS_REGION}:${accountId}:${process.env.APP_STAGE}-load-properties`,
     })
     .promise();
 }

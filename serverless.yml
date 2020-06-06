@@ -41,7 +41,7 @@ functions:
   price-loader:
     handler: src/async-operations/price-loader.run
     events:
-      - sns: load-properties
+      - sns: ${self:provider.stage}-load-properties
 
 plugins:
   - serverless-domain-manager
