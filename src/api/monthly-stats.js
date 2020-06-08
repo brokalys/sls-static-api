@@ -73,6 +73,7 @@ function discardData(data, amount = 0) {
 export const run = async (event) => {
   const queryStringParameters = decodeQuerystring(event.queryStringParameters);
   const validation = validationSchema.validate(queryStringParameters);
+  const stage = process.env.APP_STAGE === 'dev' ? 'dev' : 'prod';
 
   if (validation.error) {
     return {
@@ -100,7 +101,7 @@ export const run = async (event) => {
 
   // Load the dynamodb results
   const data = await dynamodb.batchGet(
-    `${process.env.APP_STAGE}-properties-monthly`,
+    `${stage}-properties-monthly`,
     searchQueries.map(({ hash }) => ({ hash })),
   );
 

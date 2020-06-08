@@ -12,8 +12,6 @@ provider:
   logs:
     restApi:
       level: ERROR
-  environment:
-    APP_STAGE: ${self:provider.stage}
   apiGateway:
     metrics: true
   iamRoleStatements:

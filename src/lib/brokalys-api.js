@@ -35,7 +35,7 @@ export async function getPricesInRange(start, end, filters) {
     },
     {
       headers: {
-        Authorization: process.env.BROKALYS_PRIVATE_KEY,
+        'x-api-key': process.env.BROKALYS_API_GATEWAY_KEY,
       },
     },
   );

@@ -3,6 +3,7 @@ import dynamodb from '../lib/dynamodb';
 
 export const run = async (event) => {
   const query = JSON.parse(event.Records[0].Sns.Message);
+  const stage = process.env.APP_STAGE === 'dev' ? 'dev' : 'prod';
 
   const data = await api.getPricesInRange(
     query.start_datetime,
@@ -12,7 +13,7 @@ export const run = async (event) => {
 
   const { results } = data.properties;
 
-  await dynamodb.put(`${process.env.APP_STAGE}-properties-monthly`, {
+  await dynamodb.put(`${stage}-properties-monthly`, {
     ...query,
     count: results.length,
     prices: results.map(({ price }) => price).filter((price) => !!price),
