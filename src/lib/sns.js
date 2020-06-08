@@ -10,13 +10,15 @@ const sns = new AWS.SNS({
 const accountId = isOffline() ? 123456789012 : 173751334418;
 
 export function publish(message) {
+  const stage = process.env.APP_STAGE === 'dev' ? 'dev' : 'prod';
+
   return sns
     .publish({
       Message: JSON.stringify({
         default: JSON.stringify(message),
       }),
       MessageStructure: 'json',
-      TopicArn: `arn:aws:sns:${process.env.AWS_REGION}:${accountId}:${process.env.APP_STAGE}-load-properties`,
+      TopicArn: `arn:aws:sns:${process.env.AWS_REGION}:${accountId}:${stage}-load-properties`,
     })
     .promise();
 }
