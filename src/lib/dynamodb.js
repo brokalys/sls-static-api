@@ -1,5 +1,16 @@
 import dynamodb from 'serverless-dynamodb-client';
 
+export async function get(table, hash) {
+  const { Responses } = await dynamodb.doc
+    .get({
+      TableName: table,
+      Key: { hash },
+    })
+    .promise();
+
+  return Responses[table];
+}
+
 export async function batchGet(table, keys) {
   const { Responses } = await dynamodb.doc
     .batchGet({
@@ -23,4 +34,4 @@ export function put(table, data) {
     .promise();
 }
 
-export default { batchGet, put };
+export default { get, batchGet, put };

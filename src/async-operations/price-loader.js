@@ -5,6 +5,15 @@ export const run = async (event) => {
   const query = JSON.parse(event.Records[0].Sns.Message);
   const stage = process.env.APP_STAGE === 'dev' ? 'dev' : 'prod';
 
+  // Don't hit the API unnecessarily
+  const currentData = await dynamodb.get(
+    `${stage}-properties-monthly`,
+    query.hash,
+  );
+  if (currentData) {
+    return;
+  }
+
   const data = await api.getPricesInRange(
     query.start_datetime,
     query.end_datetime,
