@@ -18,13 +18,14 @@ provider:
     - Effect: Allow
       Action:
         - SNS:Publish
-      Resource: "arn:aws:sns:eu-west-1:*:*"
+      Resource: 'arn:aws:sns:eu-west-1:*:*'
     - Effect: Allow
       Action:
         - dynamodb:BatchGetItem
+        - dynamodb:GetItem
         - dynamodb:PutItem
       Resource:
-        - "Fn::GetAtt": [ PropertiesMonthlyTable, Arn ]
+        - 'Fn::GetAtt': [PropertiesMonthlyTable, Arn]
 
 functions:
   # Public API
