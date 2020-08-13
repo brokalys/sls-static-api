@@ -8,6 +8,10 @@ export async function get(table, hash) {
     })
     .promise();
 
+  if (!Responses) {
+    return;
+  }
+
   return Responses[table];
 }
 
