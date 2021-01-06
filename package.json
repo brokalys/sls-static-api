@@ -12,7 +12,7 @@
     "deploy:ci": "yarn deploy --conceal --stage prod"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "joi": "^17.1.1",
     "moment": "^2.26.0",
     "moment-range": "^4.0.2",
