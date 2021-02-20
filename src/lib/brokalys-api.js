@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function getPricesInRange(start, end, filters) {
   const { data } = await axios.post(
-    'https://api.brokalys.com',
+    process.env.BROKALYS_API_URL,
     {
       query: `
         {
