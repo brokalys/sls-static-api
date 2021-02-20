@@ -6,13 +6,14 @@
   "license": "MIT",
   "scripts": {
     "start": "sls offline start",
+    "build": "sls package",
     "lint": "eslint src",
     "test": "jest --coverage",
-    "deploy": "serverless deploy",
+    "deploy": "sls deploy",
     "deploy:ci": "yarn deploy --conceal --stage prod"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "joi": "^17.1.1",
     "moment": "^2.26.0",
     "moment-range": "^4.0.2",
@@ -24,7 +25,7 @@
     "aws-sdk": "^2.686.0",
     "eslint": "^7.0.0",
     "eslint-plugin-prettier": "^3.0.0",
-    "husky": "^4.2.1",
+    "husky": "^5.0.9",
     "jest": "^26.0.1",
     "lint-staged": "^10.0.7",
     "prettier": "^2.0.5",
@@ -35,13 +36,8 @@
     "serverless-offline": "^6.3.0",
     "serverless-offline-sns": "^0.68.0",
     "serverless-webpack": "^5.3.2",
-    "webpack": "^4.43.0",
-    "webpack-node-externals": "^1.7.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "webpack": "^5.23.0",
+    "webpack-node-externals": "^2.5.2"
   },
   "lint-staged": {
     "*.{js,json,css,md}": [
