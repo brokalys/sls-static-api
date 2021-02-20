@@ -56,6 +56,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-offline-sns
+  - serverless-layers
 
 custom:
   customDomain:
@@ -85,10 +86,14 @@ custom:
 
   webpack:
     webpackConfig: 'webpack.config.js'
-    includeModules:
-      forceExclude:
-        - aws-sdk
+    includeModules: false
     packager: yarn
+
+  serverless-layers:
+    packageManager: yarn
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: ${self:provider.stage}-brokalys-lambda-layers
+    customInstallationCommand: yarn install --production --ignore-scripts
 
 resources:
   Resources:
