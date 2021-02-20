@@ -10,7 +10,7 @@ const sns = new AWS.SNS({
 const accountId = isOffline() ? 123456789012 : 173751334418;
 
 export function publish(message) {
-  const stage = process.env.APP_STAGE === 'dev' ? 'dev' : 'prod';
+  const stage = process.env.STAGE === 'dev' ? 'dev' : 'prod';
 
   return sns
     .publish({
