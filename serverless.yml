@@ -33,6 +33,7 @@ provider:
     STAGE: ${opt:stage, 'dev'}
     BROKALYS_API_URL: ${env:BROKALYS_API_URL}
     BROKALYS_API_GATEWAY_KEY: ${env:BROKALYS_API_GATEWAY_KEY}
+    CACHE_DYNAMODB_TABLE_NAME: ${self:custom.cacheDynamoTableName}
 
 functions:
   # Public API
@@ -59,6 +60,8 @@ plugins:
   - serverless-layers
 
 custom:
+  cacheDynamoTableName: ${self:provider.stage}-properties-monthly-cache
+
   customDomain:
     domainName: static-api.brokalys.com
     stage: prod
@@ -100,7 +103,7 @@ resources:
     PropertiesMonthlyTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.stage}-properties-monthly
+        TableName: ${self:custom.cacheDynamoTableName}
         AttributeDefinitions:
           - AttributeName: hash
             AttributeType: S

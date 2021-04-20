@@ -3,11 +3,10 @@ import dynamodb from '../lib/dynamodb';
 
 export const run = async (event) => {
   const query = JSON.parse(event.Records[0].Sns.Message);
-  const stage = process.env.STAGE === 'dev' ? 'dev' : 'prod';
 
   // Don't hit the API unnecessarily
   const currentData = await dynamodb.get(
-    `${stage}-properties-monthly`,
+    process.env.CACHE_DYNAMODB_TABLE_NAME,
     query.hash,
   );
   if (currentData) {
@@ -22,7 +21,7 @@ export const run = async (event) => {
 
   const { results } = data.properties;
 
-  await dynamodb.put(`${stage}-properties-monthly`, {
+  await dynamodb.put(process.env.CACHE_DYNAMODB_TABLE_NAME, {
     ...query,
     count: results.length,
     prices: results.map(({ price }) => price).filter((price) => !!price),

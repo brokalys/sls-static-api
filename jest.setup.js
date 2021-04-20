@@ -14,3 +14,5 @@ jest.mock('aws-sdk', () => {
 });
 
 jest.mock('axios');
+
+process.env.CACHE_DYNAMODB_TABLE_NAME = 'dynamo-table-name';
