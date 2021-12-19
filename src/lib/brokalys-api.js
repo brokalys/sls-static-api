@@ -1,3 +1,4 @@
+import { latviaRelationships } from '@brokalys/location-json-schemas';
 import axios from 'axios';
 
 export async function getPricesInRange(start, end, filters) {
@@ -28,6 +29,17 @@ export async function getPricesInRange(start, end, filters) {
           ),
           ...(filters.type === 'rent'
             ? { rent_type: { in: ['monthly', 'unknown'] } }
+            : {}),
+          ...(filters.location_classificator
+            ? {
+                location_classificator: {
+                  in: [
+                    filters.location_classificator,
+                    ...(latviaRelationships[filters.location_classificator] ||
+                      []),
+                  ],
+                },
+              }
             : {}),
           published_at: {
             gte: start,
