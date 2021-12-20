@@ -16,17 +16,27 @@ export async function get(table, hash) {
 }
 
 export async function batchGet(table, keys) {
-  const { Responses } = await dynamodb.doc
-    .batchGet({
-      RequestItems: {
-        [table]: {
-          Keys: keys,
-        },
-      },
-    })
-    .promise();
+  async function getAll(query) {
+    const { Responses, UnprocessedKeys } = await dynamodb.doc
+      .batchGet(query)
+      .promise();
 
-  return Responses[table];
+    // Recursively get all the items
+    if (!!UnprocessedKeys[table]) {
+      const unprocessed = await getAll({ RequestItems: UnprocessedKeys });
+      Responses[table].push(...unprocessed);
+    }
+
+    return Responses[table];
+  }
+
+  return getAll({
+    RequestItems: {
+      [table]: {
+        Keys: keys,
+      },
+    },
+  });
 }
 
 export function put(table, data) {

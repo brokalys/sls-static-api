@@ -11,6 +11,7 @@ describe('dynamodb', () => {
       dynamodb.doc.batchGet.mockReturnValue({
         promise: () => ({
           Responses: { 'table-name': expectation },
+          UnprocessedKeys: {},
         }),
       });
 
@@ -20,6 +21,29 @@ describe('dynamodb', () => {
       ]);
 
       expect(output).toEqual(expectation);
+    });
+
+    test('recursively retrieves data', async () => {
+      dynamodb.doc.batchGet.mockReturnValueOnce({
+        promise: () => ({
+          Responses: { 'table-name': [{ hash: 'test_123' }] },
+          UnprocessedKeys: { 'table-name': { Keys: [{ hash: 'test_444' }] } },
+        }),
+      });
+      dynamodb.doc.batchGet.mockReturnValueOnce({
+        promise: () => ({
+          Responses: { 'table-name': [{ hash: 'test_444' }] },
+          UnprocessedKeys: {},
+        }),
+      });
+
+      const output = await batchGet('table-name', [
+        { hash: 'test_123' },
+        { hash: 'test_333' },
+        { hash: 'test_444' },
+      ]);
+
+      expect(output).toEqual([{ hash: 'test_123' }, { hash: 'test_444' }]);
     });
   });
 

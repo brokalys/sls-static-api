@@ -8,7 +8,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 7
   versionFunctions: false
-  timeout: 3
+  timeout: 6
   logs:
     restApi:
       level: ERROR
@@ -48,6 +48,7 @@ functions:
   # Async price loader for given criteria
   price-loader:
     handler: src/async-operations/price-loader.run
+    reservedConcurrency: 10
     events:
       - sns: ${self:provider.stage}-load-properties
 
