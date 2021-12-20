@@ -2,7 +2,7 @@
 
 Retrieves information from the database asyncronously and stores forever for super-fast access.
 
-[![Build Status](https://travis-ci.org/brokalys/sls-static-api.svg?branch=master)](https://travis-ci.org/brokalys/sls-static-api)
+[![Build status](https://github.com/brokalys/sls-static-api/actions/workflows/deploy.yaml/badge.svg)](https://github.com/brokalys/sls-static-api/actions/workflows/deploy.yaml)
 [![codecov](https://codecov.io/gh/brokalys/sls-static-api/branch/master/graph/badge.svg)](https://codecov.io/gh/brokalys/sls-static-api)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
