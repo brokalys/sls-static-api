@@ -9,8 +9,8 @@
     "build": "sls package",
     "lint": "eslint src",
     "test": "jest --coverage",
-    "deploy": "sls deploy",
-    "deploy:ci": "yarn deploy --conceal --stage prod"
+    "deploy": "sls deploy --stage staging",
+    "deploy:ci": "sls deploy --conceal --stage prod"
   },
   "dependencies": {
     "@brokalys/location-json-schemas": "^1.3.0",
