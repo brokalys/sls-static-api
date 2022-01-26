@@ -11,10 +11,22 @@ Object {
 }
 `;
 
-exports[`monthly-stats returns the data upon success 1`] = `
+exports[`monthly-stats returns the data upon success for classifieds 1`] = `
 Object {
   "body": "{\\"loadingResults\\":0,\\"results\\":[{\\"count\\":1,\\"start_datetime\\":\\"2018-01-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":100,\\"max\\":100,\\"mean\\":100,\\"mode\\":100,\\"median\\":100},\\"pricePerSqm\\":{\\"min\\":10,\\"max\\":10,\\"mean\\":10,\\"mode\\":10,\\"median\\":10}},{\\"count\\":2,\\"start_datetime\\":\\"2018-02-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":200,\\"max\\":300,\\"mean\\":250,\\"mode\\":200,\\"median\\":250},\\"pricePerSqm\\":{\\"min\\":20,\\"max\\":30,\\"mean\\":25,\\"mode\\":20,\\"median\\":25}},{\\"count\\":0,\\"start_datetime\\":\\"2018-03-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":null,\\"max\\":null,\\"mean\\":null,\\"mode\\":null,\\"median\\":null},\\"pricePerSqm\\":{\\"min\\":null,\\"max\\":null,\\"mean\\":null,\\"mode\\":null,\\"median\\":null}}]}",
   "headers": Object {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json",
+  },
+  "statusCode": 200,
+}
+`;
+
+exports[`monthly-stats returns the data upon success for real sales 1`] = `
+Object {
+  "body": "{\\"loadingResults\\":60,\\"results\\":[{\\"count\\":1,\\"start_datetime\\":\\"2018-01-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":100,\\"max\\":100,\\"mean\\":100,\\"mode\\":100,\\"median\\":100},\\"pricePerSqm\\":{\\"min\\":10,\\"max\\":10,\\"mean\\":10,\\"mode\\":10,\\"median\\":10}},{\\"count\\":2,\\"start_datetime\\":\\"2018-02-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":200,\\"max\\":300,\\"mean\\":250,\\"mode\\":200,\\"median\\":250},\\"pricePerSqm\\":{\\"min\\":20,\\"max\\":30,\\"mean\\":25,\\"mode\\":20,\\"median\\":25}},{\\"count\\":0,\\"start_datetime\\":\\"2018-03-01T00:00:00.000Z\\",\\"price\\":{\\"min\\":null,\\"max\\":null,\\"mean\\":null,\\"mode\\":null,\\"median\\":null},\\"pricePerSqm\\":{\\"min\\":null,\\"max\\":null,\\"mean\\":null,\\"mode\\":null,\\"median\\":null}}]}",
+  "headers": Object {
+    "Access-Control-Allow-Origin": "*",
     "Content-Type": "application/json",
   },
   "statusCode": 200,

@@ -13,19 +13,22 @@ export const run = async (event) => {
     return;
   }
 
-  const data = await api.getPricesInRange(
+  const getterFn =
+    query.source === 'real-sales'
+      ? api.getVzdPricesInRange
+      : api.getPricesInRange;
+
+  const data = await getterFn(
     query.start_datetime,
     query.end_datetime,
     query.filters,
   );
 
-  const { results } = data.properties;
-
   await dynamodb.put(process.env.CACHE_DYNAMODB_TABLE_NAME, {
     ...query,
-    count: results.length,
-    prices: results.map(({ price }) => price).filter((price) => !!price),
-    pricesPerSqm: results
+    count: data.length,
+    prices: data.map(({ price }) => price).filter((price) => !!price),
+    pricesPerSqm: data
       .map(({ price_per_sqm }) => price_per_sqm)
       .filter((price_per_sqm) => !!price_per_sqm),
   });

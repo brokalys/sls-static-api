@@ -8,16 +8,37 @@ import sns from '../lib/sns';
 
 const validationSchema = Joi.object({
   discard: Joi.number().min(0).max(1).precision(2),
-  start_datetime: Joi.date().default('2018-01-01').min('2018-01-01'),
+  start_datetime: Joi.date()
+    .default('2018-01-01')
+    .when(Joi.ref('/source'), {
+      is: 'real-sales',
+      then: Joi.date().min('2013-01-01'),
+      otherwise: Joi.date().min('2018-01-01'),
+    }),
   end_datetime: Joi.date()
     .default(moment.utc().format('YYYY-MM-DD'))
     .min(Joi.ref('start_datetime'))
     .max(new Date()),
   filters: Joi.object({
-    category: Joi.string().valid('apartment', 'house', 'land').required(),
-    type: Joi.string().valid('sell', 'rent').required(),
-    location_classificator: Joi.string(),
+    category: Joi.string()
+      .when(Joi.ref('/source'), {
+        is: 'real-sales',
+        then: Joi.valid('apartment', 'house'),
+        otherwise: Joi.valid('apartment', 'house', 'land'),
+      })
+      .required(),
+    type: Joi.string().valid('sell', 'rent').when(Joi.ref('/source'), {
+      is: 'real-sales',
+      otherwise: Joi.required(),
+    }),
+    location_classificator: Joi.string().when(Joi.ref('/source'), {
+      is: 'real-sales',
+      then: Joi.required(),
+    }),
   }).required(),
+  source: Joi.string()
+    .valid('classifieds', 'real-sales')
+    .default('classifieds'),
 });
 
 function decodeQuerystring(qs) {
@@ -37,12 +58,13 @@ function decodeQuerystring(qs) {
   );
 }
 
-function prepareSearchQueries(filters, dates) {
+function prepareSearchQueries(filters, dates, source) {
   return dates
     .map((date) => ({
       filters,
       start_datetime: date.toISOString(),
       end_datetime: date.clone().endOf('month').toISOString(),
+      source: source === 'classifieds' ? undefined : source,
     }))
     .map((self) => ({
       ...self,
@@ -87,7 +109,8 @@ export const run = async (event) => {
     };
   }
 
-  const { start_datetime, end_datetime, filters, discard } = validation.value;
+  const { start_datetime, end_datetime, filters, discard, source } =
+    validation.value;
 
   const startDate = moment.utc(start_datetime);
   const endDate = moment.utc(end_datetime);
@@ -96,7 +119,7 @@ export const run = async (event) => {
   const dates = Array.from(momentRange.by('month', { excludeEnd: true }));
 
   // Build search queries for all dates
-  const searchQueries = prepareSearchQueries(filters, dates);
+  const searchQueries = prepareSearchQueries(filters, dates, source);
 
   // Load the dynamodb results
   const data = await dynamodb.batchGet(

@@ -62,11 +62,25 @@ describe('monthly-stats', () => {
     }, // start cannot be before end
     {
       filters: { category: 'apartment', type: 'sell' },
+      start_datetime: '2013-02-01',
+    }, // too far in the past
+    {
+      filters: { category: 'apartment', type: 'sell' },
       start_datetime: '2017-12-01',
     }, // start cannot be before 2018-01-01
     { discard: 1.1 }, // too large discard
     { discard: -1 }, // too small discard
     { discard: 0.133 }, // precision wrong (max: 2)
+    { source: 'wrong', filters: { category: 'apartment', type: 'sell' } }, // unrecognized source
+
+    // Real sales
+    { source: 'real-sales' }, // location_classificator is required
+    { source: 'real-sales', filters: { category: 'apartment' } }, // location_classificator is required
+    { source: 'real-sales', filters: { category: 'apartment', type: 'sell' } }, // location_classificator is required
+    {
+      source: 'real-sales',
+      filters: { category: 'land', location_classificator: 'latvia-riga' },
+    }, // land is not allowed
 
     // wrong datatypes
     '',
@@ -93,7 +107,7 @@ describe('monthly-stats', () => {
     },
   );
 
-  test('returns the data upon success', async () => {
+  test('returns the data upon success for classifieds', async () => {
     dynamodb.batchGet.mockReturnValueOnce([
       {
         hash: 'third_hash',
@@ -127,7 +141,45 @@ describe('monthly-stats', () => {
     expect(sns.publish).not.toBeCalled();
   });
 
-  test.only('discards 50% of the results', async () => {
+  test('returns the data upon success for real sales', async () => {
+    dynamodb.batchGet.mockReturnValueOnce([
+      {
+        hash: 'third_hash',
+        start_datetime: '2018-03-01T00:00:00.000Z',
+        prices: [],
+        pricesPerSqm: [],
+      },
+      {
+        hash: 'first_hash',
+        start_datetime: '2018-01-01T00:00:00.000Z',
+        prices: [100],
+        pricesPerSqm: [10],
+      },
+      {
+        hash: 'second_hash',
+        start_datetime: '2018-02-01T00:00:00.000Z',
+        prices: [200, 300],
+        pricesPerSqm: [20, 30],
+      },
+    ]);
+
+    const output = await run({
+      queryStringParameters: {
+        source: 'real-sales',
+        start_datetime: '2013-01-01',
+        end_datetime: '2018-04-01',
+        filters: {
+          category: 'apartment',
+          location_classificator: 'latvia-riga',
+        },
+      },
+    });
+
+    expect(output).toMatchSnapshot();
+    expect(sns.publish).toBeCalled();
+  });
+
+  test('discards 50% of the results', async () => {
     dynamodb.batchGet.mockReturnValueOnce([
       {
         hash: 'third_hash',
