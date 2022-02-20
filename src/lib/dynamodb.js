@@ -1,4 +1,6 @@
 import dynamodb from 'serverless-dynamodb-client';
+import chunk from 'lodash.chunk';
+import flatten from 'lodash.flatten';
 
 export async function get(table, hash) {
   const { Responses } = await dynamodb.doc
@@ -30,13 +32,20 @@ export async function batchGet(table, keys) {
     return Responses[table];
   }
 
-  return getAll({
-    RequestItems: {
-      [table]: {
-        Keys: keys,
-      },
-    },
-  });
+  const chunked = chunk(keys, 100);
+  const responses = await Promise.all(
+    chunked.map((chunkKeys) =>
+      getAll({
+        RequestItems: {
+          [table]: {
+            Keys: chunkKeys,
+          },
+        },
+      }),
+    ),
+  );
+
+  return flatten(responses);
 }
 
 export function put(table, data) {

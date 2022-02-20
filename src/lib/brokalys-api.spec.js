@@ -169,13 +169,9 @@ describe('api', () => {
       axios.post.mockResolvedValue({
         data: {
           data: {
-            buildings: [
-              {
-                vzd: {
-                  apartments: [],
-                },
-              },
-            ],
+            vzd: {
+              apartments: [],
+            },
           },
         },
       });
@@ -185,37 +181,22 @@ describe('api', () => {
       axios.post.mockResolvedValueOnce({
         data: {
           data: {
-            buildings: [
-              {
-                vzd: {
-                  apartments: [],
+            vzd: {
+              apartments: [
+                {
+                  price: 100,
+                  area: 10,
                 },
-              },
-              {
-                vzd: {
-                  apartments: [
-                    {
-                      price: 100,
-                      area: 10,
-                    },
-                    {
-                      price: 200,
-                      area: 20,
-                    },
-                  ],
+                {
+                  price: 200,
+                  area: 20,
                 },
-              },
-              {
-                vzd: {
-                  apartments: [
-                    {
-                      price: 300,
-                      area: 20,
-                    },
-                  ],
+                {
+                  price: 300,
+                  area: 15,
                 },
-              },
-            ],
+              ],
+            },
           },
         },
       });
@@ -239,7 +220,7 @@ describe('api', () => {
         },
         {
           price: 300,
-          price_per_sqm: 15,
+          price_per_sqm: 20,
         },
       ]);
     });
@@ -258,7 +239,7 @@ describe('api', () => {
         undefined,
         expect.objectContaining({
           variables: expect.objectContaining({
-            buildingFilter: expect.objectContaining({
+            filter: expect.objectContaining({
               location_classificator: {
                 in: [
                   'latvia-riga',

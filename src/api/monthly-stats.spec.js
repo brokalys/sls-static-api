@@ -1,10 +1,10 @@
 import { run } from './monthly-stats';
 
 import dynamodb from '../lib/dynamodb';
-import sns from '../lib/sns';
+import sqs from '../lib/sqs';
 
 jest.mock('../lib/dynamodb');
-jest.mock('../lib/sns');
+jest.mock('../lib/sqs');
 
 describe('monthly-stats', () => {
   beforeEach(jest.resetAllMocks);
@@ -138,7 +138,7 @@ describe('monthly-stats', () => {
     });
 
     expect(output).toMatchSnapshot();
-    expect(sns.publish).not.toBeCalled();
+    expect(sqs.sendMessage).not.toBeCalled();
   });
 
   test('returns the data upon success for real sales', async () => {
@@ -176,7 +176,7 @@ describe('monthly-stats', () => {
     });
 
     expect(output).toMatchSnapshot();
-    expect(sns.publish).toBeCalled();
+    expect(sqs.sendMessage).toBeCalled();
   });
 
   test('discards 50% of the results', async () => {
@@ -211,10 +211,10 @@ describe('monthly-stats', () => {
     });
 
     expect(output).toMatchSnapshot();
-    expect(sns.publish).not.toBeCalled();
+    expect(sqs.sendMessage).not.toBeCalled();
   });
 
-  test('triggers a SNS to load the complete dataset if something is missing', async () => {
+  test('triggers a SQS to load the complete dataset if something is missing', async () => {
     dynamodb.batchGet.mockReturnValueOnce([
       {
         hash: 'first_hash',
@@ -231,8 +231,8 @@ describe('monthly-stats', () => {
       },
     });
 
-    expect(sns.publish).toBeCalled();
-    expect(sns.publish).not.toBeCalledWith({
+    expect(sqs.sendMessage).toBeCalled();
+    expect(sqs.sendMessage).not.toBeCalledWith({
       hash: 'first_hash',
       filters: {
         category: 'apartment',

@@ -10,16 +10,14 @@ function makeEvent(customMessage = {}) {
   return {
     Records: [
       {
-        Sns: {
-          Message: JSON.stringify({
-            start_datetime: '2019-01-01T00:00:00.000Z',
-            end_datetime: '2019-02-01T00:00:00.000Z',
-            filters: {
-              category: 'apartment',
-            },
-            ...customMessage,
-          }),
-        },
+        body: JSON.stringify({
+          start_datetime: '2019-01-01T00:00:00.000Z',
+          end_datetime: '2019-02-01T00:00:00.000Z',
+          filters: {
+            category: 'apartment',
+          },
+          ...customMessage,
+        }),
       },
     ],
   };

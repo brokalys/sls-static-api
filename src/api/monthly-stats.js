@@ -4,7 +4,7 @@ import numbers from 'numbers';
 import dynamodb from '../lib/dynamodb';
 import createHash from '../lib/hash';
 import moment from '../lib/moment';
-import sns from '../lib/sns';
+import sqs from '../lib/sqs';
 
 const validationSchema = Joi.object({
   discard: Joi.number().min(0).max(1).precision(2),
@@ -130,14 +130,14 @@ export const run = async (event) => {
   // Calculate how many more results are missing
   const loadingResults = searchQueries.length - data.length;
 
-  // Trigger SNS actions for each result that's not found in the archive
+  // Trigger SQS actions for each result that's not found in the archive
   if (loadingResults > 0) {
     const foundRows = data.map(({ hash }) => hash);
     const notFoundRows = searchQueries.filter(
       ({ hash }) => !foundRows.includes(hash),
     );
 
-    await Promise.all(notFoundRows.map(sns.publish));
+    await Promise.all(notFoundRows.map(sqs.sendMessage));
   }
 
   const results = data

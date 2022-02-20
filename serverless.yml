@@ -20,8 +20,9 @@ provider:
       statements:
         - Effect: Allow
           Action:
-            - SNS:Publish
-          Resource: 'arn:aws:sns:eu-west-1:*:*'
+            - SQS:SendMessage
+          Resource:
+            - 'Fn::GetAtt': [PriceLoaderQueue, Arn]
         - Effect: Allow
           Action:
             - dynamodb:BatchGetItem
@@ -50,14 +51,40 @@ functions:
     handler: src/async-operations/price-loader.run
     reservedConcurrency: 10
     events:
-      - sns: ${self:provider.stage}-load-properties
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PriceLoaderQueue
+              - Arn
+          batchSize: 1
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PriceLoaderQueue
+              - Arn
+          batchSize: 1
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PriceLoaderQueue
+              - Arn
+          batchSize: 1
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PriceLoaderQueue
+              - Arn
+          batchSize: 1
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PriceLoaderQueue
+              - Arn
+          batchSize: 1
 
 plugins:
   - serverless-domain-manager
   - serverless-webpack
-  - serverless-dynamodb-local
-  - serverless-offline
-  - serverless-offline-sns
   - serverless-layers
 
 custom:
@@ -69,24 +96,6 @@ custom:
     certificateName: '*.brokalys.com'
     createRoute53Record: true
     endpointType: edge
-
-  serverless-offline:
-    useChildProcesses: true
-
-  serverless-offline-sns:
-    port: 4002
-    debug: true
-
-  dynamodb:
-    stages:
-      - dev
-    start:
-      port: 8000
-      inMemory: true
-      heapInitial: 200m
-      heapMax: 1g
-      migrate: true
-      convertEmptyValues: true
 
   webpack:
     webpackConfig: 'webpack.config.js'
@@ -101,6 +110,20 @@ custom:
 
 resources:
   Resources:
+    PriceLoaderQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-price-loader.fifo
+        FifoQueue: true
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt PriceLoaderDeadLetterQueue.Arn
+          maxReceiveCount: 3
+    PriceLoaderDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-price-loader-dlq.fifo
+        FifoQueue: true
+
     PropertiesMonthlyTable:
       Type: AWS::DynamoDB::Table
       Properties:

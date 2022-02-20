@@ -70,16 +70,6 @@ Live example: [click here](https://static-api.brokalys.com/stats/monthly?filters
 yarn install
 ```
 
-### Running locally
-
-Prerequities:
-
-- Java Runtime Engine (JRE) version 6.x or newer (`brew cask install java`) for local DyanmodDB
-
-```sh
-yarn start
-```
-
 ### Testing
 
 ```sh
@@ -93,7 +83,7 @@ yarn test
 yarn deploy
 
 # prod stage
-sls create_domain # do this only for initial deployment
+yarn sls create_domain # do this only for initial deployment
 yarn deploy:ci
 ```
 

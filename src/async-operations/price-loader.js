@@ -2,7 +2,7 @@ import api from '../lib/brokalys-api';
 import dynamodb from '../lib/dynamodb';
 
 export const run = async (event) => {
-  const query = JSON.parse(event.Records[0].Sns.Message);
+  const query = JSON.parse(event.Records[0].body);
 
   // Don't hit the API unnecessarily
   const currentData = await dynamodb.get(

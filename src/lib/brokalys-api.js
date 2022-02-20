@@ -74,33 +74,26 @@ export async function getVzdPricesInRange(start, end, filters) {
     process.env.BROKALYS_API_URL,
     {
       query: `
-        query DataExtraction_VZDPricesInRange($buildingFilter: BuildingFilter!, $vzdFilter: VZDFilter!) {
-          buildings(
-            filter: $buildingFilter,
-            limit: null
-          ) {
-            vzd {
-              ${apiField}(filter: $vzdFilter) {
-                price
-                area: ${areaField[filters.category]}
-              }
+        query DataExtraction_VZDPricesInRange($filter: VZDFilter!) {
+          vzd {
+            ${apiField}(filter: $filter) {
+              price
+              area: ${areaField[filters.category]}
             }
           }
         }
       `,
       variables: {
-        buildingFilter: {
+        filter: {
+          sale_date: {
+            gte: start,
+            lte: end,
+          },
           location_classificator: {
             in: [
               filters.location_classificator,
               ...(latviaRelationships[filters.location_classificator] || []),
             ],
-          },
-        },
-        vzdFilter: {
-          sale_date: {
-            gte: start,
-            lte: end,
           },
         },
       },
@@ -116,17 +109,11 @@ export async function getVzdPricesInRange(start, end, filters) {
     throw new Error('Error calling the API: ' + JSON.stringify(data.errors));
   }
 
-  const prices = [];
-  for (const building of data.data.buildings) {
-    for (const sale of building.vzd[apiField]) {
-      prices.push({
-        price: sale.price,
-        price_per_sqm: sale.price / sale.area,
-      });
-    }
-  }
-
-  return prices;
+  return data.data.vzd[apiField].map((sale) => ({
+    price: sale.price,
+    price_per_sqm:
+      sale.price > 0 && sale.area > 0 ? sale.price / sale.area : null,
+  }));
 }
 
 export default { getPricesInRange, getVzdPricesInRange };

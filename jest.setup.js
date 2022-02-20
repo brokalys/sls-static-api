@@ -7,8 +7,8 @@ jest.mock('aws-sdk', () => {
 
   return {
     DynamoDB,
-    SNS: jest.fn().mockReturnValue({
-      publish: jest.fn().mockReturnValue({ promise: jest.fn() }),
+    SQS: jest.fn().mockReturnValue({
+      sendMessage: jest.fn().mockReturnValue({ promise: jest.fn() }),
     }),
   };
 });
