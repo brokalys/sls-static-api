@@ -72,6 +72,7 @@ describe('monthly-stats', () => {
     { discard: -1 }, // too small discard
     { discard: 0.133 }, // precision wrong (max: 2)
     { source: 'wrong', filters: { category: 'apartment', type: 'sell' } }, // unrecognized source
+    { filters: { category: 'apartment', type: 'sell' }, period: 'wrong' }, // unrecognized period
 
     // Real sales
     { source: 'real-sales' }, // location_classificator is required
@@ -134,6 +135,35 @@ describe('monthly-stats', () => {
         start_datetime: '2018-01-01',
         end_datetime: '2018-04-01',
         filters: { category: 'apartment', type: 'sell' },
+      },
+    });
+
+    expect(output).toMatchSnapshot();
+    expect(sqs.sendMessage).not.toBeCalled();
+  });
+
+  test('returns the data grouped in quarters', async () => {
+    dynamodb.batchGet.mockReturnValueOnce([
+      {
+        hash: 'first_hash',
+        start_datetime: '2018-01-01T00:00:00.000Z',
+        prices: [100, 200, 300],
+        pricesPerSqm: [10, 20, 30],
+      },
+      {
+        hash: 'second_hash',
+        start_datetime: '2018-05-01T00:00:00.000Z',
+        prices: [400],
+        pricesPerSqm: [40],
+      },
+    ]);
+
+    const output = await run({
+      queryStringParameters: {
+        start_datetime: '2018-01-01',
+        end_datetime: '2018-09-01',
+        filters: { category: 'apartment', type: 'sell' },
+        period: 'quarter',
       },
     });
 
@@ -237,6 +267,37 @@ describe('monthly-stats', () => {
       filters: {
         category: 'apartment',
       },
+    });
+  });
+
+  test('triggers a SQS to load the complete dataset for missing quarter', async () => {
+    dynamodb.batchGet.mockReturnValueOnce([
+      {
+        hash: 'aa909b5ed7c41e67cc8ace57a78dd996',
+        start_datetime: '2018-01-01T00:00:00.000Z',
+        prices: [100, 200, 300],
+        pricesPerSqm: [10, 20, 30],
+      },
+    ]);
+
+    await run({
+      queryStringParameters: {
+        start_datetime: '2018-01-01',
+        end_datetime: '2018-09-01',
+        filters: { category: 'apartment', type: 'sell' },
+        period: 'quarter',
+      },
+    });
+
+    expect(sqs.sendMessage).toBeCalledWith({
+      hash: expect.any(String),
+      start_datetime: '2018-04-01T00:00:00.000Z',
+      end_datetime: '2018-06-30T23:59:59.999Z',
+      filters: {
+        category: 'apartment',
+        type: 'sell',
+      },
+      source: undefined,
     });
   });
 });

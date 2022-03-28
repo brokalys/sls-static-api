@@ -39,6 +39,7 @@ const validationSchema = Joi.object({
   source: Joi.string()
     .valid('classifieds', 'real-sales')
     .default('classifieds'),
+  period: Joi.string().valid('month', 'quarter', 'year').default('month'),
 });
 
 function decodeQuerystring(qs) {
@@ -60,10 +61,10 @@ function decodeQuerystring(qs) {
 
 function prepareSearchQueries(filters, dates, source) {
   return dates
-    .map((date) => ({
+    .map(([startDate, endDate]) => ({
       filters,
-      start_datetime: date.toISOString(),
-      end_datetime: date.clone().endOf('month').toISOString(),
+      start_datetime: startDate.toISOString(),
+      end_datetime: endDate.toISOString(),
       source: source === 'classifieds' ? undefined : source,
     }))
     .map((self) => ({
@@ -109,14 +110,16 @@ export const run = async (event) => {
     };
   }
 
-  const { start_datetime, end_datetime, filters, discard, source } =
+  const { start_datetime, end_datetime, filters, discard, source, period } =
     validation.value;
 
   const startDate = moment.utc(start_datetime);
   const endDate = moment.utc(end_datetime);
 
   const momentRange = moment().range(startDate, endDate);
-  const dates = Array.from(momentRange.by('month', { excludeEnd: true }));
+  const dates = Array.from(momentRange.by(period, { excludeEnd: true })).map(
+    (date) => [date, date.clone().endOf(period)],
+  );
 
   // Build search queries for all dates
   const searchQueries = prepareSearchQueries(filters, dates, source);
@@ -137,7 +140,7 @@ export const run = async (event) => {
       ({ hash }) => !foundRows.includes(hash),
     );
 
-    await Promise.all(notFoundRows.map(sqs.sendMessage));
+    await Promise.all(notFoundRows.map((row) => sqs.sendMessage(row)));
   }
 
   const results = data

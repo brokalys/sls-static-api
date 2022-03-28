@@ -76,7 +76,10 @@ export async function getVzdPricesInRange(start, end, filters) {
       query: `
         query DataExtraction_VZDPricesInRange($filter: VZDFilter!) {
           vzd {
-            ${apiField}(filter: $filter) {
+            ${apiField}(
+              filter: $filter
+              limit: null
+            ) {
               price
               area: ${areaField[filters.category]}
             }
