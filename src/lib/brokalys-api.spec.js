@@ -184,14 +184,17 @@ describe('api', () => {
             vzd: {
               apartments: [
                 {
+                  sale_id: 1,
                   price: 100,
                   area: 10,
                 },
                 {
-                  price: 200,
-                  area: 20,
+                  sale_id: 1,
+                  price: 100,
+                  area: 40,
                 },
                 {
+                  sale_id: 2,
                   price: 300,
                   area: 15,
                 },
@@ -212,11 +215,7 @@ describe('api', () => {
       expect(output).toEqual([
         {
           price: 100,
-          price_per_sqm: 10,
-        },
-        {
-          price: 200,
-          price_per_sqm: 10,
+          price_per_sqm: 2,
         },
         {
           price: 300,

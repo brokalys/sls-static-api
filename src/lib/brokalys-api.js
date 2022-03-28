@@ -1,5 +1,6 @@
 import { latviaRelationships } from '@brokalys/location-json-schemas';
 import axios from 'axios';
+import groupBy from 'lodash.groupby';
 
 export async function getPricesInRange(start, end, filters) {
   const { data } = await axios.post(
@@ -80,6 +81,7 @@ export async function getVzdPricesInRange(start, end, filters) {
               filter: $filter
               limit: null
             ) {
+              sale_id
               price
               area: ${areaField[filters.category]}
             }
@@ -112,11 +114,17 @@ export async function getVzdPricesInRange(start, end, filters) {
     throw new Error('Error calling the API: ' + JSON.stringify(data.errors));
   }
 
-  return data.data.vzd[apiField].map((sale) => ({
-    price: sale.price,
-    price_per_sqm:
-      sale.price > 0 && sale.area > 0 ? sale.price / sale.area : null,
-  }));
+  return Object.values(groupBy(data.data.vzd[apiField], 'sale_id')).map(
+    (sales) => {
+      const totalArea = sales.reduce((carry, sale) => carry + sale.area, 0);
+      const [{ price }] = sales;
+
+      return {
+        price,
+        price_per_sqm: price > 0 && totalArea > 0 ? price / totalArea : null,
+      };
+    },
+  );
 }
 
 export default { getPricesInRange, getVzdPricesInRange };
