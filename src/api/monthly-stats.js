@@ -62,7 +62,10 @@ function decodeQuerystring(qs) {
 function prepareSearchQueries(filters, dates, source) {
   return dates
     .map(([startDate, endDate]) => ({
-      filters,
+      filters: {
+        ...filters,
+        type: source === 'classifieds' ? filters.type : 'sell',
+      },
       start_datetime: startDate.toISOString(),
       end_datetime: endDate.toISOString(),
       source: source === 'classifieds' ? undefined : source,
