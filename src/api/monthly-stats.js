@@ -20,13 +20,7 @@ const validationSchema = Joi.object({
     .min(Joi.ref('start_datetime'))
     .max(new Date()),
   filters: Joi.object({
-    category: Joi.string()
-      .when(Joi.ref('/source'), {
-        is: 'real-sales',
-        then: Joi.valid('apartment', 'house'),
-        otherwise: Joi.valid('apartment', 'house', 'land'),
-      })
-      .required(),
+    category: Joi.string().valid('apartment', 'house', 'land').required(),
     type: Joi.string().valid('sell', 'rent').when(Joi.ref('/source'), {
       is: 'real-sales',
       otherwise: Joi.required(),

@@ -69,6 +69,7 @@ export async function getVzdPricesInRange(start, end, filters) {
     apartment: 'apartment_total_area_m2',
     premise: 'space_group_total_area_m2',
     house: 'building_total_area_m2',
+    land: 'land_total_area_m2',
   };
 
   const { data } = await axios.post(

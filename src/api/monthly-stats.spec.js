@@ -78,10 +78,6 @@ describe('monthly-stats', () => {
     { source: 'real-sales' }, // location_classificator is required
     { source: 'real-sales', filters: { category: 'apartment' } }, // location_classificator is required
     { source: 'real-sales', filters: { category: 'apartment', type: 'sell' } }, // location_classificator is required
-    {
-      source: 'real-sales',
-      filters: { category: 'land', location_classificator: 'latvia-riga' },
-    }, // land is not allowed
 
     // wrong datatypes
     '',
