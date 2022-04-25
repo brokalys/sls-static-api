@@ -64,7 +64,8 @@ export async function getPricesInRange(start, end, filters) {
 }
 
 export async function getVzdPricesInRange(start, end, filters) {
-  const apiField = filters.category + 's';
+  const apiField =
+    filters.category === 'land' ? 'land' : filters.category + 's';
   const areaField = {
     apartment: 'apartment_total_area_m2',
     premise: 'space_group_total_area_m2',
