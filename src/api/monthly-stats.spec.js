@@ -137,7 +137,11 @@ describe('monthly-stats', () => {
       queryStringParameters: {
         start_datetime: '2018-01-01',
         end_datetime: '2018-04-01',
-        filters: { category: 'apartment', type: 'sell' },
+        filters: {
+          category: 'apartment',
+          type: 'sell',
+          location_classificator: 'latvia-riga-vecpilseta',
+        },
       },
     });
 

@@ -11,7 +11,7 @@ const VALID_LOCATION_IDS = Array.from(
   Object.entries(latviaRelationships).reduce(
     (carry, [locationId, children]) => {
       carry.add(locationId);
-      if (children.length) carry.add(...children);
+      children.forEach((child) => carry.add(child));
       return carry;
     },
     new Set(),
