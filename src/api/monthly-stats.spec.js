@@ -19,6 +19,13 @@ describe('monthly-stats', () => {
     encodeURIComponent(JSON.stringify({ unknown: 'apartment', type: 'sell' })), // unknown keys
     encodeURIComponent(JSON.stringify({})), // missing category
     encodeURIComponent({ category: 'apartment', type: 'sell' }), // not JSON-encoded
+    encodeURIComponent(
+      JSON.stringify({
+        category: 'apartment',
+        type: 'sell',
+        location_classificator: 'whats-this',
+      }),
+    ), // unknown location_classificator
 
     // wrong datatypes
     '',

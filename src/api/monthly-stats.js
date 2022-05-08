@@ -1,3 +1,4 @@
+import { latviaRelationships } from '@brokalys/location-json-schemas';
 import Joi from 'joi';
 import numbers from 'numbers';
 
@@ -5,6 +6,17 @@ import dynamodb from '../lib/dynamodb';
 import createHash from '../lib/hash';
 import moment from '../lib/moment';
 import sqs from '../lib/sqs';
+
+const VALID_LOCATION_IDS = Array.from(
+  Object.entries(latviaRelationships).reduce(
+    (carry, [locationId, children]) => {
+      carry.add(locationId);
+      if (children.length) carry.add(...children);
+      return carry;
+    },
+    new Set(),
+  ),
+);
 
 const validationSchema = Joi.object({
   discard: Joi.number().min(0).max(1).precision(2),
@@ -25,10 +37,12 @@ const validationSchema = Joi.object({
       is: 'real-sales',
       otherwise: Joi.required(),
     }),
-    location_classificator: Joi.string().when(Joi.ref('/source'), {
-      is: 'real-sales',
-      then: Joi.required(),
-    }),
+    location_classificator: Joi.string()
+      .valid(...VALID_LOCATION_IDS)
+      .when(Joi.ref('/source'), {
+        is: 'real-sales',
+        then: Joi.required(),
+      }),
   }).required(),
   source: Joi.string()
     .valid('classifieds', 'real-sales')
