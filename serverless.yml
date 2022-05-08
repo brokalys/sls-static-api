@@ -34,6 +34,7 @@ provider:
     STAGE: ${opt:stage, 'dev'}
     BROKALYS_API_URL: ${env:BROKALYS_API_URL}
     BROKALYS_API_GATEWAY_KEY: ${env:BROKALYS_API_GATEWAY_KEY}
+    BUGSNAG_KEY: ${env:BUGSNAG_KEY}
     CACHE_DYNAMODB_TABLE_NAME: ${self:custom.cacheDynamoTableName}
 
 functions:

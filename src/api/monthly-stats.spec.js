@@ -1,4 +1,4 @@
-import { run } from './monthly-stats';
+import { handler } from './monthly-stats';
 
 import dynamodb from '../lib/dynamodb';
 import sqs from '../lib/sqs';
@@ -40,7 +40,7 @@ describe('monthly-stats', () => {
   ])(
     'returns a validation error if filter validation fails with: %# - %j',
     async (input) => {
-      const output = await run({
+      const output = await handler({
         queryStringParameters: {
           filters: input,
         },
@@ -99,7 +99,7 @@ describe('monthly-stats', () => {
   ])(
     'returns a validation error if root-level validation fails with: %# - %j',
     async (input) => {
-      const output = await run({
+      const output = await handler({
         queryStringParameters: input,
       });
 
@@ -133,7 +133,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    const output = await run({
+    const output = await handler({
       queryStringParameters: {
         start_datetime: '2018-01-01',
         end_datetime: '2018-04-01',
@@ -165,7 +165,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    const output = await run({
+    const output = await handler({
       queryStringParameters: {
         start_datetime: '2018-01-01',
         end_datetime: '2018-09-01',
@@ -200,7 +200,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    const output = await run({
+    const output = await handler({
       queryStringParameters: {
         source: 'real-sales',
         start_datetime: '2013-01-01',
@@ -238,7 +238,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    const output = await run({
+    const output = await handler({
       queryStringParameters: {
         discard: 0.5,
         start_datetime: '2018-01-01',
@@ -260,7 +260,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    await run({
+    await handler({
       queryStringParameters: {
         start_datetime: '2018-01-01',
         end_datetime: '2018-03-01',
@@ -287,7 +287,7 @@ describe('monthly-stats', () => {
       },
     ]);
 
-    await run({
+    await handler({
       queryStringParameters: {
         start_datetime: '2018-01-01',
         end_datetime: '2018-09-01',

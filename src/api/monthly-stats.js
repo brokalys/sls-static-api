@@ -7,6 +7,24 @@ import createHash from '../lib/hash';
 import moment from '../lib/moment';
 import sqs from '../lib/sqs';
 
+import Bugsnag from '@bugsnag/js';
+import BugsnagPluginAwsLambda from '@bugsnag/plugin-aws-lambda';
+
+const busgnagLogger = {
+  debug: function () {},
+  info: console.info,
+  warn: console.warn,
+  error: console.error,
+};
+
+Bugsnag.start({
+  apiKey: process.env.BUGSNAG_KEY,
+  logger: busgnagLogger,
+  releaseStage: process.env.STAGE,
+  enabledReleaseStages: ['staging', 'prod'],
+  plugins: [BugsnagPluginAwsLambda],
+});
+
 const VALID_LOCATION_IDS = Array.from(
   Object.entries(latviaRelationships).reduce(
     (carry, [locationId, children]) => {
@@ -104,7 +122,7 @@ function discardData(data, amount = 0) {
     .splice(discardStart, itemCount - discardStart * 2);
 }
 
-export const run = async (event) => {
+export const handler = async (event) => {
   const queryStringParameters = decodeQuerystring(event.queryStringParameters);
   const validation = validationSchema.validate(queryStringParameters);
 
@@ -184,3 +202,6 @@ export const run = async (event) => {
     }),
   };
 };
+
+const bugsnagHandler = Bugsnag.getPlugin('awsLambda').createHandler();
+export const run = bugsnagHandler(handler);
