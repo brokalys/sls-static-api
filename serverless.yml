@@ -4,7 +4,7 @@ useDotenv: true
 provider:
   name: aws
   region: eu-west-1
-  runtime: nodejs14.x
+  runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
   logRetentionInDays: 7
   versionFunctions: false
@@ -73,6 +73,7 @@ custom:
     certificateName: '*.brokalys.com'
     createRoute53Record: true
     endpointType: edge
+    enabled: ${env:ENABLE_CUSTOM_DOMAIN, true}
 
   webpack:
     webpackConfig: 'webpack.config.js'
