@@ -42,7 +42,7 @@ const validationSchema = Joi.object({
     .default('2018-01-01')
     .when(Joi.ref('/source'), {
       is: 'real-sales',
-      then: Joi.date().min('2013-01-01'),
+      then: Joi.date().min('1998-01-01'),
       otherwise: Joi.date().min('2018-01-01'),
     }),
   end_datetime: Joi.date()
