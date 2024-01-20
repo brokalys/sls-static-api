@@ -9,12 +9,11 @@ provider:
   logRetentionInDays: 7
   versionFunctions: false
   timeout: 6
-  logs:
-    restApi:
-      level: ERROR
   apiGateway:
     metrics: true
     shouldStartNameWithService: true
+    restApiId: 839umpo2p0
+    restApiRootResourceId: slqsd77aig
   iam:
     role:
       statements:
