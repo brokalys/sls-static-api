@@ -1,14 +1,26 @@
-import dynamodb from 'serverless-dynamodb-client';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import {
+  BatchGetCommand,
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+} from '@aws-sdk/lib-dynamodb';
+
 import chunk from 'lodash.chunk';
 import flatten from 'lodash.flatten';
 
+const client = new DynamoDBClient({
+  region: process.env.AWS_REGION,
+});
+const docClient = DynamoDBDocumentClient.from(client);
+
 export async function get(table, hash) {
-  const { Responses } = await dynamodb.doc
-    .get({
+  const { Responses } = await docClient.send(
+    new GetCommand({
       TableName: table,
       Key: { hash },
-    })
-    .promise();
+    }),
+  );
 
   if (!Responses) {
     return;
@@ -19,9 +31,9 @@ export async function get(table, hash) {
 
 export async function batchGet(table, keys) {
   async function getAll(query) {
-    const { Responses, UnprocessedKeys } = await dynamodb.doc
-      .batchGet(query)
-      .promise();
+    const { Responses, UnprocessedKeys } = await docClient.send(
+      new GetCommand(query),
+    );
 
     // Recursively get all the items
     if (!!UnprocessedKeys[table]) {
@@ -49,12 +61,10 @@ export async function batchGet(table, keys) {
 }
 
 export function put(table, data) {
-  return dynamodb.doc
-    .put({
-      TableName: table,
-      Item: data,
-    })
-    .promise();
+  return docClient.send({
+    TableName: table,
+    Item: data,
+  });
 }
 
 export default { get, batchGet, put };

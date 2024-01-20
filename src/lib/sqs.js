@@ -1,20 +1,20 @@
-import AWS from 'aws-sdk';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 
-const sqs = new AWS.SQS({
-  apiVersion: '2012-11-05',
+const client = new SQSClient({
+  region: process.env.AWS_REGION,
 });
 
 const accountId = 173751334418;
 
 export function sendMessage(message) {
-  return sqs
-    .sendMessage({
+  return client.send(
+    new SendMessageCommand({
       MessageBody: JSON.stringify(message),
       MessageGroupId: 'price-loader',
       MessageDeduplicationId: JSON.stringify(message.hash),
       QueueUrl: `https://sqs.${process.env.AWS_REGION}.amazonaws.com/${accountId}/${process.env.STAGE}-price-loader.fifo`,
-    })
-    .promise();
+    }),
+  );
 }
 
 export default { sendMessage };
