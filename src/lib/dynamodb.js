@@ -61,10 +61,12 @@ export async function batchGet(table, keys) {
 }
 
 export function put(table, data) {
-  return docClient.send({
-    TableName: table,
-    Item: data,
-  });
+  return docClient.send(
+    new PutCommand({
+      TableName: table,
+      Item: data,
+    }),
+  );
 }
 
 export default { get, batchGet, put };
