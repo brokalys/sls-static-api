@@ -32,7 +32,7 @@ export async function get(table, hash) {
 export async function batchGet(table, keys) {
   async function getAll(query) {
     const { Responses, UnprocessedKeys } = await docClient.send(
-      new GetCommand(query),
+      new BatchGetCommand(query),
     );
 
     // Recursively get all the items
